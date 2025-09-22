@@ -1,0 +1,23 @@
+{
+  "name": "aard2-web-offline",
+  "version": "1.0.0",
+  "description": "A limitless free dictionary in your browser, offline",
+  "main": "wordnet-to-sqlite.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukew3/aard2-web-offline.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lukew3/aard2-web-offline/issues"
+  },
+  "homepage": "https://github.com/lukew3/aard2-web-offline#readme",
+  "dependencies": {
+    "cli-progress": "^3.12.0",
+    "sqlite3": "^5.1.7"
+  }
+}
