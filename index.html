@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Basic Dictionary (sql.js)</title>
+<title>Offline Dictionary (sql.js)</title>
 <style>
 body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:24px;}
 .container{max-width:800px;margin:0 auto;}
@@ -47,7 +47,7 @@ button{padding:8px 12px;font-size:1rem;}
 <body>
 <div class="container">
 <h1>Basic Dictionary (sql.js + wordnet)</h1>
-<p>Type a word and press Search. This page loads a generated <code>wordnet.db</code> using sql.js in the browser — run it from a local or static server (e.g. <code>python -m http.server</code>).</p>
+<p>Type a word and press Search. This page loads a generated <code>wordnet.db</code> using sql.js in the browser. After the database has been downloaded, you can continue to use the app offline. Developers: run it from a local or static server (e.g. <code>python -m http.server</code>).</p>
 <form id="searchForm">
 <input id="query" type="text" placeholder="Enter a word" autocomplete="off" required />
 <button type="submit">Search</button>
