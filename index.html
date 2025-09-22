@@ -46,8 +46,8 @@ button{padding:8px 12px;font-size:1rem;}
 </head>
 <body>
 <div class="container">
-<h1>Basic Dictionary (sql.js + words.db)</h1>
-<p>Type a word and press Search. This page loads <code>words.db</code> using sql.js in the browser — run it from a local or static server (e.g. <code>python -m http.server</code>).</p>
+<h1>Basic Dictionary (sql.js + wordnet)</h1>
+<p>Type a word and press Search. This page loads a generated <code>wordnet.db</code> using sql.js in the browser — run it from a local or static server (e.g. <code>python -m http.server</code>).</p>
 <form id="searchForm">
 <input id="query" type="text" placeholder="Enter a word" autocomplete="off" required />
 <button type="submit">Search</button>
@@ -86,12 +86,12 @@ button{padding:8px 12px;font-size:1rem;}
   }
 
   try {
-    infoEl.textContent = 'Fetching words.db...';
+    infoEl.textContent = 'Fetching wordnet.db...';
     progressContainer.style.display = 'block';
     updateProgress(0, 0);
 
     const res = await fetch('wordnetFull.db');
-    if (!res.ok) throw new Error('Failed to fetch words.db: ' + res.status);
+    if (!res.ok) throw new Error('Failed to fetch wordnet.db: ' + res.status);
 
     const contentLength = res.headers.get('content-length');
     const total = contentLength ? parseInt(contentLength, 10) : 0;
