@@ -17,6 +17,31 @@ button{padding:8px 12px;font-size:1rem;}
 .meta{font-size:0.9rem;color:#444;margin-top:8px;}
 .defH{margin:0;}
 .defP{margin:0;}
+#progress-container {
+  width: 100%;
+  margin-top: 12px;
+}
+#progress-bar {
+  width: 100%;
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+#progress-fill {
+  height: 100%;
+  background-color: #4caf50;
+  width: 0%;
+  transition: width 0.3s ease;
+  border-radius: 10px;
+}
+#progress-text {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 12px;
+}
 </style>
 </head>
 <body>
@@ -28,6 +53,12 @@ button{padding:8px 12px;font-size:1rem;}
 <button type="submit">Search</button>
 </form>
 <div id="info">Loading database...</div>
+<div id="progress-container" style="display: none; margin-top: 12px;">
+  <div id="progress-bar">
+    <div id="progress-fill"></div>
+  </div>
+  <div id="progress-text">0%</div>
+</div>
 <div id="error" role="alert" aria-live="assertive"></div>
 <h2 id="wordTitle"></h2>
 <ol id="definition" aria-live="polite"></ol>
@@ -43,17 +74,54 @@ button{padding:8px 12px;font-size:1rem;}
   const infoEl = document.getElementById('info');
   const errorEl = document.getElementById('error');
   const defEl = document.getElementById('definition');
+  const progressContainer = document.getElementById('progress-container');
+  const progressFill = document.getElementById('progress-fill');
+  const progressText = document.getElementById('progress-text');
   let db = null;
+
+  function updateProgress(loaded, total) {
+    const percent = total ? (loaded / total) * 100 : 0;
+    progressFill.style.width = percent + '%';
+    progressText.textContent = Math.round(percent) + '%';
+  }
 
   try {
     infoEl.textContent = 'Fetching words.db...';
+    progressContainer.style.display = 'block';
+    updateProgress(0, 0);
+
     const res = await fetch('wordnetFull.db');
     if (!res.ok) throw new Error('Failed to fetch words.db: ' + res.status);
-    const buffer = await res.arrayBuffer();
-    db = new SQL.Database(new Uint8Array(buffer));
+
+    const contentLength = res.headers.get('content-length');
+    const total = contentLength ? parseInt(contentLength, 10) : 0;
+    let loaded = 0;
+
+    const reader = res.body.getReader();
+    const chunks = [];
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      chunks.push(value);
+      loaded += value.length;
+      updateProgress(loaded, total);
+    }
+
+    const buffer = new Uint8Array(loaded);
+    let offset = 0;
+    for (const chunk of chunks) {
+      buffer.set(chunk, offset);
+      offset += chunk.length;
+    }
+
+    db = new SQL.Database(buffer);
     infoEl.textContent = 'Database loaded.';
+    progressContainer.style.display = 'none';
   } catch (e) {
     infoEl.textContent = '';
+    progressContainer.style.display = 'none';
     errorEl.textContent = 'Error loading database: ' + e.message;
     console.error(e);
     return;
