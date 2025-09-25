@@ -33,6 +33,16 @@ function App() {
     loadDatabase()
   }, [])
 
+  useEffect(() => {
+    // Check for query parameter on page load
+    const urlParams = new URLSearchParams(window.location.search)
+    const searchWord = urlParams.get('word')
+    if (searchWord && db && !isLoading) {
+      setQuery(searchWord)
+      performSearch(searchWord)
+    }
+  }, [db, isLoading])
+
   const loadDatabase = async (): Promise<void> => {
     try {
       setInfo('Fetching wordnet.db...')
@@ -84,9 +94,8 @@ function App() {
     }
   }
 
-  const handleSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault()
-    if (!db || !query.trim()) return
+  const performSearch = async (searchQuery: string): Promise<void> => {
+    if (!db || !searchQuery.trim()) return
 
     setError('')
     setDefinitions([])
@@ -98,7 +107,7 @@ function App() {
       const stmtExact = db.prepare(`SELECT word, pos, definition FROM "${tableName}" WHERE lower(word) = $w;`)
 
       const rows: Definition[] = []
-      stmtExact.bind({$w: query.toLowerCase()})
+      stmtExact.bind({$w: searchQuery.toLowerCase()})
       while(stmtExact.step()){
         const row = stmtExact.getAsObject() as unknown as Definition
         rows.push(row)
@@ -106,7 +115,7 @@ function App() {
       stmtExact.reset()
 
       setDefinitions(rows)
-      setWordTitle(query)
+      setWordTitle(searchQuery)
       setInfo('')
       if(rows.length === 0) setInfo('No definitions found')
     } catch(err){
@@ -114,6 +123,18 @@ function App() {
       setError('Search error: ' + (err as Error).message)
       setInfo('')
     }
+  }
+
+  const handleSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault()
+    if (!db || !query.trim()) return
+
+    // Update URL with query parameter
+    const url = new URL(window.location.href)
+    url.searchParams.set('word', query)
+    window.history.pushState({}, '', url.toString())
+
+    await performSearch(query)
   }
 
   const escapeHtml = (str: string | null | undefined): string => {
