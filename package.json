@@ -2,9 +2,11 @@
   "name": "aard2-web-offline",
   "version": "1.0.0",
   "description": "A limitless free dictionary in your browser, offline",
-  "main": "wordnet-to-sqlite.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -17,7 +19,16 @@
   },
   "homepage": "https://github.com/lukew3/aard2-web-offline#readme",
   "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sql.js": "^1.8.0",
     "cli-progress": "^3.12.0",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^4.4.0"
   }
 }
