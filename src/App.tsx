@@ -2,21 +2,38 @@ import { useState, useEffect } from 'react'
 import initSqlJs from 'sql.js'
 import './App.css'
 
+interface Definition {
+  word: string
+  pos: string
+  definition: string
+}
+
+interface Database {
+  prepare: (sql: string) => Statement
+}
+
+interface Statement {
+  bind: (params: Record<string, any>) => void
+  step: () => boolean
+  getAsObject: () => Definition
+  reset: () => void
+}
+
 function App() {
-  const [query, setQuery] = useState('')
-  const [info, setInfo] = useState('Loading database...')
-  const [error, setError] = useState('')
-  const [definitions, setDefinitions] = useState([])
-  const [wordTitle, setWordTitle] = useState('')
-  const [db, setDb] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [progress, setProgress] = useState(0)
+  const [query, setQuery] = useState<string>('')
+  const [info, setInfo] = useState<string>('Loading database...')
+  const [error, setError] = useState<string>('')
+  const [definitions, setDefinitions] = useState<Definition[]>([])
+  const [wordTitle, setWordTitle] = useState<string>('')
+  const [db, setDb] = useState<Database | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [progress, setProgress] = useState<number>(0)
 
   useEffect(() => {
     loadDatabase()
   }, [])
 
-  const loadDatabase = async () => {
+  const loadDatabase = async (): Promise<void> => {
     try {
       setInfo('Fetching wordnet.db...')
       setIsLoading(true)
@@ -25,8 +42,8 @@ function App() {
       const SQL = await initSqlJs({
         // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
         // You can omit locateFile completely when running in node
-        locateFile: file => `https://sql.js.org/dist/${file}`
-      });
+        locateFile: (file: string) => `https://sql.js.org/dist/${file}`
+      })
 
       const res = await fetch('wordnetFull.db')
       if (!res.ok) throw new Error('Failed to fetch wordnet.db: ' + res.status)
@@ -35,8 +52,8 @@ function App() {
       const total = contentLength ? parseInt(contentLength, 10) : 0
       let loaded = 0
 
-      const reader = res.body.getReader()
-      const chunks = []
+      const reader = res.body!.getReader()
+      const chunks: Uint8Array[] = []
 
       while (true) {
         const { done, value } = await reader.read()
@@ -56,18 +73,18 @@ function App() {
       }
 
       const database = new SQL.Database(buffer)
-      setDb(database)
+      setDb(database as unknown as Database)
       setInfo('Database loaded.')
       setIsLoading(false)
     } catch (e) {
       setInfo('')
-      setError('Error loading database: ' + e.message)
+      setError('Error loading database: ' + (e as Error).message)
       setIsLoading(false)
       console.error(e)
     }
   }
 
-  const handleSearch = async (e) => {
+  const handleSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     if (!db || !query.trim()) return
 
@@ -80,10 +97,11 @@ function App() {
       const tableName = 'words'
       const stmtExact = db.prepare(`SELECT word, pos, definition FROM "${tableName}" WHERE lower(word) = $w;`)
 
-      const rows = []
+      const rows: Definition[] = []
       stmtExact.bind({$w: query.toLowerCase()})
       while(stmtExact.step()){
-        rows.push(stmtExact.getAsObject())
+        const row = stmtExact.getAsObject() as unknown as Definition
+        rows.push(row)
       }
       stmtExact.reset()
 
@@ -93,12 +111,12 @@ function App() {
       if(rows.length === 0) setInfo('No definitions found')
     } catch(err){
       console.error(err)
-      setError('Search error: ' + err.message)
+      setError('Search error: ' + (err as Error).message)
       setInfo('')
     }
   }
 
-  const escapeHtml = (str) => {
+  const escapeHtml = (str: string | null | undefined): string => {
     if (str === null || str === undefined) return ''
     return String(str)
       .replace(/&/g, '&')
@@ -113,7 +131,7 @@ function App() {
       <nav>
         <h1 id="navTitle">Offline Dictionary</h1>
       </nav>
-      
+
       <form onSubmit={handleSearch}>
         <input
           type="text"
@@ -141,7 +159,7 @@ function App() {
       <div id="definitionList" aria-live="polite">
         {definitions.map((def, index) => (
           <div className="defItem" key={index}>
-            <div>{index})</div>
+            <div>{index + 1})</div>
             <div><strong>{def.pos}.</strong> {escapeHtml(def.definition)}</div>
           </div>
         ))}
