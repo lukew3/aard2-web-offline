@@ -1,9 +1,5 @@
 node_modules
 
-# Database files
-*.db
-public/*.db
-
 # Build output
 dist/
 build/
