@@ -137,6 +137,20 @@ function App() {
     await performSearch(query)
   }
 
+  const handleNavTitleClick = (): void => {
+    // Clear all query parameters from URL
+    const url = new URL(window.location.href)
+    url.searchParams.delete('word')
+    window.history.pushState({}, '', url.toString())
+
+    // Clear search state
+    setQuery('')
+    setDefinitions([])
+    setWordTitle('')
+    setInfo('')
+    setError('')
+  }
+
   const escapeHtml = (str: string | null | undefined): string => {
     if (str === null || str === undefined) return ''
     return String(str)
@@ -150,7 +164,7 @@ function App() {
   return (
     <div className="container">
       <nav>
-        <h1 id="navTitle">Offline Dictionary</h1>
+        <h1 id="navTitle" onClick={handleNavTitleClick} style={{cursor: 'pointer'}}>Offline Dictionary</h1>
       </nav>
 
       <form onSubmit={handleSearch}>
