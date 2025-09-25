@@ -110,8 +110,9 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Exact Word Dictionary (sql.js + wordnet)</h1>
-      <p>Type an exact word and press Search. This page loads a generated <code>wordnet.db</code> using sql.js in the browser. After the database has been downloaded, you can continue to use the app offline. Developers: run it from a local or static server (e.g. <code>python -m http.server</code>).</p>
+      <nav>
+        <h1 id="navTitle">Offline Dictionary</h1>
+      </nav>
       
       <form onSubmit={handleSearch}>
         <input
@@ -135,15 +136,16 @@ function App() {
 
       <div id="info">{info}</div>
       <div id="error" role="alert" aria-live="assertive">{error}</div>
-      
+
       {wordTitle && <h2>{wordTitle}</h2>}
-      <ol id="definition" aria-live="polite">
+      <div id="definitionList" aria-live="polite">
         {definitions.map((def, index) => (
-          <li key={index} className="defP">
-            <span><strong>{def.pos}.</strong> {escapeHtml(def.definition)}</span>
-          </li>
+          <div className="defItem" key={index}>
+            <div>{index})</div>
+            <div><strong>{def.pos}.</strong> {escapeHtml(def.definition)}</div>
+          </div>
         ))}
-      </ol>
+      </div>
     </div>
   )
 }
