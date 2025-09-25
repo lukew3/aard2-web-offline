@@ -1,0 +1,60 @@
+/* Search History Component Styles */
+
+
+.search-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.search-history-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.clear-history-btn {
+  background-color: #D3BF95;
+  border: 1px solid #000;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #000;
+}
+
+.clear-history-btn:hover {
+  background-color: #c4a876;
+}
+
+.search-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.search-history-item {
+  background-color: #a0855f;
+  padding: 10px 12px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-history-item:hover {
+  background-color: #b0956f;
+}
+
+.history-word {
+  font-weight: bold;
+  flex: 1;
+}
+
+.history-timestamp {
+  font-size: 0.8rem;
+  text-align: right;
+  min-width: 150px;
+}

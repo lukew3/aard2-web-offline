@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import initSqlJs from 'sql.js'
 import './App.css'
+import SearchHistory from './SearchHistory'
 
 interface Definition {
   word: string
@@ -118,6 +119,11 @@ function App() {
       setWordTitle(searchQuery)
       setInfo('')
       if(rows.length === 0) setInfo('No definitions found')
+
+      // Add search to history
+      if ((window as any).addToSearchHistory) {
+        (window as any).addToSearchHistory(searchQuery)
+      }
     } catch(err){
       console.error(err)
       setError('Search error: ' + (err as Error).message)
@@ -199,6 +205,14 @@ function App() {
           </div>
         ))}
       </div>
+
+      {/* Show search history when no results and no active search */}
+      {!wordTitle && definitions.length === 0 && !isLoading && (
+        <SearchHistory onWordClick={(word) => {
+          setQuery(word)
+          performSearch(word)
+        }} />
+      )}
     </div>
   )
 }
